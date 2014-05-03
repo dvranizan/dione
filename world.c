@@ -13,28 +13,10 @@ static dioneObject *renderObjects[MAX_OBJECTS];
 
 static int currentObjCount = 0;
 
-void registerObject(dioneObject *obj) {
-	print_message(MSG_VERBOSE_NOTE, "Registering obj...", MSG_FLAG_NONE);
-	renderObjects[currentObjCount++] = obj;
-}
 
 static clear_screen() {
 	SDL_SetRenderDrawColor(global_renderer, 0, 0, 0, 255);
 	SDL_RenderClear(global_renderer);
-}
-
-static render_objects() {
-	int x;
-	for (x = 0; x < currentObjCount; x++) {
-		/* update phase -
-		   hit every object and mutate appropriately */
-		updateObject(renderObjects[x]);
-		/* draw phase -
-		   if objects are drawable, draw . does not affect game world */
-		drawObject(renderObjects[x]);
-	}
-	/* the terminal is special, so i just jam it here.  I expect all the gui to go here */
-	render_terminal();
 }
 
 static flip_screen() {
@@ -48,6 +30,7 @@ int worldLoop() {
 	/* init everything */
 	init_font();
 	init_message_system();
+	init_kernel();
 
 	/* setup camera */
 	cameraInit();
@@ -63,32 +46,21 @@ int worldLoop() {
 				done = true;
 				break;
 			case SDL_KEYDOWN:
-				/* pass the key to the list of items that care about keypress */
-				switch (e.key.keysym.sym) {
-				case SDLK_BACKQUOTE:
-				/* special case the console */
-					toggle_console();
-					break;
-				case SDLK_w:
-				case SDLK_s:
-				case SDLK_a:
-				case SDLK_d:
-					/* player WASD bro! */
-					updatePlayerDirection = e.key.keysym.sym;
-				break;
-				default:
-					break;
-				}
+			case SDL_KEYUP:
+				/* pass the key even to kernel */
+				kernel_queueKeyboardEvent(e.type, e.key.keysym);
 				break;
 			case SDL_MOUSEBUTTONDOWN:
 				/* pass the event to the list of items that care about mousepress */
 				break;
 			}
 		}
+		/* crank event wheel */
+		kernel_exec_events();
 		/* ok events have been processed, DRAW TIME */
 		clear_screen();
-		/* first the render phase */
-		render_objects();
+		/* first the render phase (update, draw)*/
+		kernel_handle_objects();
 		/* flip that mofo */
 		flip_screen();
 		/* control the FPS like a mofo */

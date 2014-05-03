@@ -53,5 +53,5 @@ void drawObject(dioneObject *obj) {
 		/* I never want to be here */
 		print_message(MSG_VERBOSE_ERROR, "I have no idea how to handle this!", MSG_FLAG_NONE);
 	}
-};
+}
 

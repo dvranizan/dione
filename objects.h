@@ -74,4 +74,10 @@ typedef struct {
 
 #define TYPEOF(obj) (((dioneObject*)obj)->type)
 
+/* kernel objects */
+/* kernel events  */
+typedef struct {
+	SDL_Event *event;
+	int tick_time;
+} kernelEvent;
 #endif

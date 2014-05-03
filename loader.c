@@ -1,5 +1,6 @@
 #include "build.h"
 #include "world.h"
+#include "kernel.h"
 
 void loadLevel_1() {
 	int x;
@@ -8,9 +9,9 @@ void loadLevel_1() {
 	/* build and register them */
 	for (x = 0; x < 5; x++) {
 		obj = buildWave(x);
-		registerObject((dioneObject*)obj);
+		kernel_register_object((dioneObject*)obj);
 	}
 	/* player is almost always last so it is on top */
 	player = buildHuman();
-	registerObject((dioneObject*)player);
+	kernel_register_object((dioneObject*)player);
 }

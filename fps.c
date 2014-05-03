@@ -13,3 +13,9 @@ void fps_break() {
 	fps_last_ticks = current_ticks;
 	return;
 }
+
+int fps_get_ticks() {
+	/* for now just return SDL ticks.
+	   More logic re: game time will probably need to be put here */
+	return SDL_GetTicks();
+}
