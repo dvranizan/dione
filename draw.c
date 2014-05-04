@@ -49,6 +49,9 @@ void drawObject(dioneObject *obj) {
 	case OBJ_WAVE:
 		drawWave((waveObject*)obj, &drawable);
 		break;
+	case OBJ_CUSTOM:
+		(((customObject*)obj)->drawFunc)(obj);
+		break;
 	default:
 		/* I never want to be here */
 		print_message(MSG_VERBOSE_ERROR, "I have no idea how to handle this!", MSG_FLAG_NONE);

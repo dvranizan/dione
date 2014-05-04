@@ -24,7 +24,7 @@ waveObject* buildWave(int num) {
 	buildObject((dioneObject*)new_obj, OBJ_WAVE, NULL, l);
 	new_obj->color = SDL_COLORWHEEL_WHITE;
 	new_obj->frequency = 0;
-	new_obj->amplitude = 0;
+	new_obj->amplitude = 200;
 	new_obj->phase = 0;
 	new_obj->birth_ticks = SDL_GetTicks();
 	new_obj->line = malloc(sizeof(SDL_Point)*SCREEN_WIDTH);
@@ -42,4 +42,22 @@ humanObject* buildHuman() {
 	new_obj->life = 100;
 	new_obj->selected = SDL_FALSE;
 	return new_obj;
+}
+
+customObject* buildCustom(void(*updateFunc)(dioneObject*), 
+						  void(*drawFunc)(dioneObject*), 
+						  void(*listenFunc)(dioneObject*, void*)) {
+	SDL_Rect l = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
+	customObject *new_obj = malloc(sizeof(customObject));
+	buildObject((dioneObject*)new_obj, OBJ_CUSTOM, "customobj", l);
+	new_obj->updateFunc = updateFunc;
+	new_obj->drawFunc = drawFunc;
+	new_obj->listenFunc = listenFunc;
+	return new_obj;
+}
+
+void destroyObject(dioneObject *obj) {
+	if (obj) {
+		free(obj);
+	}
 }

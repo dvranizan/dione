@@ -1,6 +1,7 @@
 #include "SDL2/SDL.h"
 #include <stdbool.h>
 /* see http://www.python.org/dev/peps/pep-3123/ for my rational here... */
+
 #ifndef _OBJECTS_H
 #define _OBJECTS_H
 
@@ -24,7 +25,8 @@ typedef enum _WINDOW_BORDER_STYLE {
 typedef enum _OBJECT_TYPE {
 	OBJ_LINES,
 	OBJ_PEOPLE,
-	OBJ_WAVE
+	OBJ_WAVE,
+	OBJ_CUSTOM
 } OBJECT_TYPE;
 
 /* 
@@ -46,6 +48,13 @@ typedef struct _object {
 	SDL_Rect l;
 	SDL_Texture *texture;
 } dioneObject;
+
+typedef struct {
+	dioneObject ob_base;
+	void (*updateFunc)(dioneObject*);
+	void (*drawFunc)(dioneObject*);
+	void (*listenFunc)(dioneObject*, void*);
+} customObject;
 
 typedef struct {
 	dioneObject ob_base;

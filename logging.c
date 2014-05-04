@@ -1,9 +1,12 @@
 #include "SDL2/SDL.h"
+#include <assert.h>
 
 #include "logging.h"
 #include "font.h"
 #include "globals.h"
-
+#include "objects.h"
+#include "build.h"
+#include "kernel.h"
 
 msg_node *msg_root = NULL;
 static SDL_Color default_color = {0,0,0};
@@ -11,9 +14,28 @@ static SDL_Color highlight_color = {0,0,0};
 static int msg_count = 0;
 static msg_verbosity global_verbosity = MSG_VERBOSE_WARNING;
 static int console_hidden = 0;
+static customObject *console_obj = NULL;
+
+void register_console() {
+	assert(!console_obj);
+	console_obj = buildCustom(&update_terminal, &draw_terminal, &listen_terminal);
+	kernel_add_listener((dioneObject*)console_obj, INPUT_CAPTURE_NORMAL);
+}
 
 void toggle_console() {
+	assert(console_obj);
 	console_hidden = (console_hidden) ? 0 : !console_hidden;
+
+	if (!console_hidden) {
+		/* register term w/ kernel to draw */
+		kernel_register_object((dioneObject*)console_obj, WINDOW_STACK_ON_TOP, INPUT_CAPTURE_NONE);
+		/* TODO - elevate listening to block input to other objects */
+	} else {
+		/* remove the terminal */
+		(void)kernel_remove_object((dioneObject*)console_obj);
+		//destroyObject((dioneObject*)console_obj);
+		//console_obj = NULL;
+	}
 }
 
 static msg_node *new_msg_node() {
@@ -75,7 +97,7 @@ void init_message_system() {
 	
 }
 
-void render_terminal() {
+void draw_terminal(dioneObject *obj) {
 	int msg_index;
 	msg_node *current_msg = msg_root;
 	SDL_Rect msg_pos;
@@ -109,5 +131,24 @@ void render_terminal() {
 		/*increase pos*/
 		msg_pos.y += msg_pos.h;
 		current_msg = current_msg->next;
+	}
+}
+
+void update_terminal(dioneObject *obj) {
+	/* STUB */
+}
+
+void listen_terminal(dioneObject *obj, void *data) {
+	dioneEventKey *key = data;
+	assert(TYPEOF(obj) == OBJ_CUSTOM);
+
+	switch (key->key.sym) {
+	case SDLK_BACKQUOTE:
+		/* toggle the terminal */
+		if (key->key_type == SDL_KEYDOWN)
+			toggle_console();
+		break;
+	default:
+		break;
 	}
 }

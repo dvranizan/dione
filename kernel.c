@@ -7,15 +7,26 @@
 #include "objects.h"
 #include "fps.h"
 #include "logging.h"
-
+#include "listen.h"
 static dioneObject *gSelectedObjects[KERNEL_MAX_SELECTED_OBJECTS];
 static GHashTable *gQueuedEvents;
 static GHashTable *gRenderObjects;
+static GSList *gInputObjects;
 static int gSelectedObjects_index = 0;
 
-void kernel_register_object(dioneObject *obj) {
+void kernel_register_object_simple(dioneObject *obj) {
+	kernel_register_object(obj, WINDOW_STACK_DEFAULT, INPUT_CAPTURE_NONE);
+}
+
+void kernel_register_object(dioneObject *obj, 
+							WINDOW_STACK_TYPE winType, INPUT_CAPTURE_TYPE captureType) {
+	/* register OBJ with kernel */
 	print_message(MSG_VERBOSE_NOTE, "Registering obj...", MSG_FLAG_NONE);
 	g_hash_table_add(gRenderObjects, obj);
+	/* if it listens to input, register it */
+	if (captureType > INPUT_CAPTURE_NONE) {
+		gInputObjects = g_slist_prepend(gInputObjects, obj);
+	}
 }
 
 SDL_bool kernel_remove_object(dioneObject *obj) {
@@ -23,6 +34,17 @@ SDL_bool kernel_remove_object(dioneObject *obj) {
 		return SDL_TRUE;
 	} else {
 		return SDL_FALSE;
+	}
+}
+
+SDL_bool kernel_remove_listener(dioneObject *obj) {
+	gInputObjects = g_slist_remove(gInputObjects, obj);
+	return SDL_TRUE;
+}
+
+void kernel_add_listener(dioneObject *obj, INPUT_CAPTURE_TYPE captureType) {
+	if (captureType > INPUT_CAPTURE_NONE) {
+		gInputObjects = g_slist_prepend(gInputObjects, obj);
 	}
 }
 
@@ -42,8 +64,6 @@ void kernel_handle_objects() {
 		   if objects are drawable, draw . does not affect game world */
 		drawObject(dObj);
 	}
-	/* the terminal is special, so i just jam it here.  I expect all the gui to go here */
-	render_terminal();
 }
 
 /*
@@ -55,7 +75,12 @@ void init_kernel() {
 	*/
 	gQueuedEvents = g_hash_table_new(NULL, NULL);
 	gRenderObjects = g_hash_table_new(NULL, NULL);
+	gInputObjects = NULL;
+
+	/* built in hooks */
+	register_console();
 }
+
 /*
   kernel_init_event() should init all parts of the base dioneEvent struct
 */
@@ -68,6 +93,17 @@ static void kernel_init_event(dioneEvent *ev, EVENT_TYPE t, int evTime) {
 SDL_bool kernel_addSelected(dioneObject *obj) {
 }
 
+/* 
+   broadcast keystroke to any obj listening.
+*/
+static void kernel_broadcast_key_event(dioneEventKey *key) {
+	GSList *iter = gInputObjects;
+	while(iter) {
+		listen_handler((dioneObject*)(iter->data), key);
+		iter = g_slist_next(iter);
+	}
+	
+}
 /*
   event has been flagged to exec, eventually falls here.
   for now this is a big case, but probably a good idea to break
@@ -79,11 +115,6 @@ static void kernel_exec_event(dioneEvent *ev) {
 		dioneEventKey *key = (dioneEventKey*)ev;
 		print_message(MSG_VERBOSE_NOTE, "Key pressed!", MSG_FLAG_NONE);
 		switch (key->key.sym) {
-		case SDLK_BACKQUOTE:
-			/* special case the console for now... vomit */
-			if (key->key_type == SDL_KEYDOWN)
-				toggle_console();
-			break;
 		case SDLK_w:
 		case SDLK_s:
 		case SDLK_a:
@@ -93,6 +124,9 @@ static void kernel_exec_event(dioneEvent *ev) {
 		default:
 			break;	
 		}
+		/* all special high level kernel keyjacking done.
+		   send key event to all obj's registered to listen */
+		kernel_broadcast_key_event(key);
 		break;
 	}
 	default:

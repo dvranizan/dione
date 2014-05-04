@@ -9,9 +9,9 @@ void loadLevel_1() {
 	/* build and register them */
 	for (x = 0; x < 5; x++) {
 		obj = buildWave(x);
-		kernel_register_object((dioneObject*)obj);
+		kernel_register_object_simple((dioneObject*)obj);
 	}
 	/* player is almost always last so it is on top */
 	player = buildHuman();
-	kernel_register_object((dioneObject*)player);
+	kernel_register_object_simple((dioneObject*)player);
 }
