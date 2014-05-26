@@ -7,7 +7,8 @@ typedef enum {
 	MSG_VERBOSE_NOTE,
 	MSG_VERBOSE_WARNING,
 	MSG_VERBOSE_ERROR,
-	MSG_VERBOSE_FATAL
+	MSG_VERBOSE_FATAL,
+	MSG_VERBOSE_ALL
 } msg_verbosity;
 
 typedef struct _msg_node {
