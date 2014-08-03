@@ -1,4 +1,8 @@
+#ifdef __GNUC__
 #include "SDL2/SDL.h"
+#else
+#include "SDL.h"
+#endif
 #include <stdbool.h>
 /* see http://www.python.org/dev/peps/pep-3123/ for my rational here... */
 

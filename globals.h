@@ -1,3 +1,9 @@
+#ifdef __GNUC__
+#include "SDL2/SDL.h"
+#else
+#include "SDL.h"
+#endif
+
 extern int MAX_MESSAGES;
 extern SDL_Renderer *global_renderer;
 

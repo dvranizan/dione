@@ -1,4 +1,8 @@
+#ifdef __GNUC__
 #include "SDL2/SDL.h"
+#else
+#include "SDL.h"
+#endif
 #include "SDL_ttf.h"
 #include <assert.h>
 
@@ -8,7 +12,12 @@ static TTF_Font *global_font = NULL;
 
 int init_font() {
 	TTF_Init();
+#ifdef __GNUC__
 	global_font = TTF_OpenFont("fonts/FreeMono.ttf", 24);
+#else
+	global_font = TTF_OpenFont("C:\\Users\\david\\Source\\Repos\\dione\\fonts\\FreeMono.ttf", 24);
+#endif
+	assert(global_font);
 }
 
 SDL_Texture *render_font(char *string, SDL_Color color) {
