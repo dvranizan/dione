@@ -120,7 +120,6 @@ void draw_terminal(dioneObject *obj) {
 
 	/* iterate over messages as long as we have room */
 	for (l = gMessageList; l != NULL; l = l->next) {
-		int h, w;
 		msg_node *node = (msg_node*)(l->data);
 		/*render text*/
 		SDL_QueryTexture(node->msg_meat, NULL, NULL, &msg_pos.w, &msg_pos.h);

@@ -50,10 +50,13 @@ static void updatePerson(humanObject *obj) {
 	}
 }
 
+static void updatePoly(polyObject *obj) {
+}
+
 /* this processes all game events and updates items appropriately */
 void updateObject(dioneObject *obj) {
 	switch (TYPEOF(obj)) {
-	case OBJ_LINES:
+	case OBJ_LINE:
 		updateLine((waveObject*)obj);
 		break;
 	case OBJ_PEOPLE:
@@ -64,6 +67,9 @@ void updateObject(dioneObject *obj) {
 		break;
 	case OBJ_CUSTOM:
 		(((customObject*)obj)->updateFunc)(obj);
+		break;
+	case OBJ_POLY:
+		updatePoly((polyObject*)obj);
 		break;
 	default:
 		/* I never want to be here */

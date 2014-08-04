@@ -21,8 +21,73 @@ static void drawPerson(humanObject* obj, SDL_Rect *drawable) {
 	SDL_RenderDrawRect(global_renderer, drawable);
 }
 
-static void drawLine(waveObject* obj, SDL_Rect *drawable) {
-	/* STUB */
+static void drawBetweenPoints(SDL_Point* p1, SDL_Point* p2, SDL_Color c, int w) {
+	double divDiff;
+	bool yLonger = false;
+	int incrementVal;
+	int shortLen;
+	int longLen;
+
+	if (!p1 || !p2) {
+		return;
+	}
+
+	shortLen = p2->y - p1->y;
+	longLen = p2->x - p1->x;
+
+	//determine long
+	if (abs(shortLen)>abs(longLen)) {
+		int swap = shortLen;
+		shortLen = longLen;
+		longLen = swap;
+		yLonger = true;
+	}
+
+	if (longLen<0) incrementVal = -1;
+	else incrementVal = 1;
+
+	if (shortLen == 0) divDiff = longLen;
+	else divDiff = (double)longLen / (double)shortLen;
+
+	//ok time to draw
+	SDL_SetRenderDrawColor(global_renderer, c.r, c.g, c.b, 255);
+	if (yLonger) {
+		for (int i = 0; i != longLen; i += incrementVal) {
+			SDL_RenderDrawPoint(global_renderer, p1->x + (int)((double)i / divDiff), p1->y + i);
+		}
+	}
+	else {
+		for (int i = 0; i != longLen; i += incrementVal) {
+			SDL_RenderDrawPoint(global_renderer, p1->x + i, p1->y + (int)((double)i / divDiff));
+		}
+	}
+}
+
+static void drawLine(lineObject* l, SDL_Rect *drawable) {
+	SDL_Point p1 = { l->x1, l->y1 };
+	SDL_Point p2 = { l->x2, l->y2 };
+	drawBetweenPoints(&p1, &p2, l->color, l->w);
+}
+
+static void drawPoly(polyObject* obj, SDL_Rect *drawable) {
+	GList* l;
+	SDL_Point *p1 = NULL;
+	SDL_Point *p2 = NULL;
+
+	if (g_list_length(obj->pointList) < 2) {
+		/* nothing to draw */
+		return;
+	}
+
+	for (l = obj->pointList; l != NULL; l = l->next) {
+		/* shift points and draw */
+		p1 = p2;
+		p2 = (SDL_Point*)(l->data);
+		drawBetweenPoints(p1, p2, obj->color, 1);
+	}
+	/* connect final point */
+	p1 = (SDL_Point*)(obj->pointList->data);
+	drawBetweenPoints(p1, p2, obj->color, 1);
 }
 
 /* this is the main pump that will call all the specific functions */
@@ -44,8 +109,8 @@ void drawObject(dioneObject *obj) {
 	/* drawable is now in pixels not world units.
 	   We can just draw it like it is! */
 	switch (TYPEOF(obj)) {
-	case OBJ_LINES:
-		drawLine((waveObject*)obj, &drawable);
+	case OBJ_LINE:
+		drawLine((lineObject*)obj, &drawable);
 		break;
 	case OBJ_PEOPLE:
 		drawPerson((humanObject*)obj, &drawable);
@@ -56,9 +121,12 @@ void drawObject(dioneObject *obj) {
 	case OBJ_CUSTOM:
 		(((customObject*)obj)->drawFunc)(obj);
 		break;
+	case OBJ_POLY:
+		drawPoly((polyObject*)obj, &drawable);
+		break;
 	default:
 		/* I never want to be here */
-		print_message(MSG_VERBOSE_ERROR, "I have no idea how to handle this!", MSG_FLAG_NONE);
+		print_message(MSG_VERBOSE_ERROR, "[draw] I have no idea how to handle this!", MSG_FLAG_NONE);
 	}
 }
 

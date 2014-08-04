@@ -4,7 +4,7 @@
 
 void listen_handler(dioneObject *obj, void *data) {
 	switch (TYPEOF(obj)) {
-	case OBJ_LINES:
+	case OBJ_LINE:
 	case OBJ_PEOPLE:
 	case OBJ_WAVE:
 		/*unimplimented*/

@@ -4,6 +4,8 @@
 #include "SDL.h"
 #endif
 #include <stdbool.h>
+#include "glib.h"
+
 /* see http://www.python.org/dev/peps/pep-3123/ for my rational here... */
 
 #ifndef _OBJECTS_H
@@ -27,10 +29,11 @@ typedef enum _WINDOW_BORDER_STYLE {
 } WINDOW_BORDER_STYLE;
 
 typedef enum _OBJECT_TYPE {
-	OBJ_LINES,
+	OBJ_LINE,
 	OBJ_PEOPLE,
 	OBJ_WAVE,
-	OBJ_CUSTOM
+	OBJ_CUSTOM,
+	OBJ_POLY
 } OBJECT_TYPE;
 
 /* 
@@ -85,6 +88,23 @@ typedef struct {
 	int baseline;
 } waveObject;
 
+typedef struct {
+	dioneObject ob_base;
+	SDL_Color color;
+	int w;
+	int x1;
+	int y1;
+	int x2;
+	int y2;
+} lineObject;
+
+typedef struct {
+	dioneObject ob_base;
+	SDL_Color color;
+	int fill; /* fill the polygon with color? */
+	GList *pointList;
+} polyObject;
+
 #define TYPEOF(obj) (((dioneObject*)obj)->type)
 
 /* kernel objects */
@@ -93,4 +113,5 @@ typedef struct {
 	SDL_Event *event;
 	int tick_time;
 } kernelEvent;
+
 #endif

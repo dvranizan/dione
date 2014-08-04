@@ -4,6 +4,7 @@
 #include "SDL.h"
 #endif
 
+#include "glib.h"
 #include "globals.h"
 #include "objects.h"
 
@@ -58,6 +59,64 @@ customObject* buildCustom(void(*updateFunc)(dioneObject*),
 	new_obj->drawFunc = drawFunc;
 	new_obj->listenFunc = listenFunc;
 	return new_obj;
+}
+
+lineObject* buildLine(SDL_Color c, int w, int x1, int y1, int x2, int y2) {
+	SDL_Rect l = { x1, y1, x2, y2 };
+	lineObject *line = malloc(sizeof(lineObject));
+	buildObject((dioneObject*)line, OBJ_LINE, "line", l);
+	line->color = c;
+	line->w = w;
+	line->x1 = x1;
+	line->x2 = x2;
+	line->y1 = y1;
+	line->y2 = y2;
+
+	return line;
+}
+
+static void growRecttoFitPoint(SDL_Rect* rect, SDL_Point point) {
+	SDL_Rect temp = { point.x, point.y, 0, 0 };
+	if (SDL_HasIntersection(&temp, rect) == SDL_TRUE) {
+		/* no need to grow */
+		return;
+	}
+	if (point.x < rect->x) {
+		rect->w += rect->x - point.x;
+		rect->x = point.x;
+	}
+	else if (point.x >(rect->x + rect->w)) {
+		rect->w = point.x - rect->x;
+	}
+	if (point.y < rect->y) {
+		rect->h += rect->y - point.y;
+		rect->y = point.y;
+	}
+	else if (point.y >(rect->y + rect->h)) {
+		rect->h = point.y - rect->y;
+	}
+}
+
+polyObject* buildPoly(SDL_Color c, int polyFill, GList* pointList) {
+	SDL_Rect l = { 0, 0, 0, 0 }; //empty collision box, will grow when iterating line list
+	polyObject *poly = malloc(sizeof(polyObject));
+	GList *ll = pointList;
+
+	if (pointList->data) {
+		SDL_Point *firstPoint = pointList->data;
+		l.x = firstPoint->x;
+		l.y = firstPoint->y;
+	}
+	for (ll = pointList; ll != NULL; ll = ll->next) {
+		SDL_Point *point = (SDL_Point*)(ll->data);
+		growRecttoFitPoint(&l, *point);
+	}
+	buildObject((dioneObject*)poly, OBJ_POLY, "poly", l);
+	poly->color = c;
+	poly->fill = polyFill;
+	poly->pointList = pointList;
+
+	return poly;
 }
 
 void destroyObject(dioneObject *obj) {
