@@ -53,6 +53,9 @@ static void updatePerson(humanObject *obj) {
 static void updatePoly(polyObject *obj) {
 }
 
+static void updateBezier(bezierObject *obj) {
+}
+
 /* this processes all game events and updates items appropriately */
 void updateObject(dioneObject *obj) {
 	switch (TYPEOF(obj)) {
@@ -70,6 +73,9 @@ void updateObject(dioneObject *obj) {
 		break;
 	case OBJ_POLY:
 		updatePoly((polyObject*)obj);
+		break;
+	case OBJ_BEZIER:
+		updateBezier((bezierObject*)obj);
 		break;
 	default:
 		/* I never want to be here */

@@ -82,6 +82,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\bezier.c" />
     <ClCompile Include="..\..\build.c" />
     <ClCompile Include="..\..\camera.c" />
     <ClCompile Include="..\..\console.c" />
@@ -99,6 +100,7 @@
     <ClCompile Include="..\..\world.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\bezier.h" />
     <ClInclude Include="..\..\build.h" />
     <ClInclude Include="..\..\camera.h" />
     <ClInclude Include="..\..\console.h" />

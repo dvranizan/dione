@@ -33,7 +33,8 @@ typedef enum _OBJECT_TYPE {
 	OBJ_PEOPLE,
 	OBJ_WAVE,
 	OBJ_CUSTOM,
-	OBJ_POLY
+	OBJ_POLY,
+	OBJ_BEZIER
 } OBJECT_TYPE;
 
 /* 
@@ -104,6 +105,15 @@ typedef struct {
 	int fill; /* fill the polygon with color? */
 	GList *pointList;
 } polyObject;
+
+typedef struct {
+	dioneObject ob_base;
+	SDL_Color color;
+	SDL_Point p0;
+	SDL_Point p1;
+	SDL_Point p2;
+	SDL_Point p3;
+} bezierObject;
 
 #define TYPEOF(obj) (((dioneObject*)obj)->type)
 
