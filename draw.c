@@ -27,6 +27,7 @@ static void drawBetweenPoints(SDL_Point* p1, SDL_Point* p2, SDL_Color c, int w) 
 	int incrementVal;
 	int shortLen;
 	int longLen;
+	int i;
 
 	if (!p1 || !p2) {
 		return;
@@ -52,12 +53,12 @@ static void drawBetweenPoints(SDL_Point* p1, SDL_Point* p2, SDL_Color c, int w) 
 	//ok time to draw
 	SDL_SetRenderDrawColor(global_renderer, c.r, c.g, c.b, 255);
 	if (yLonger) {
-		for (int i = 0; i != longLen; i += incrementVal) {
+		for (i = 0; i != longLen; i += incrementVal) {
 			SDL_RenderDrawPoint(global_renderer, p1->x + (int)((double)i / divDiff), p1->y + i);
 		}
 	}
 	else {
-		for (int i = 0; i != longLen; i += incrementVal) {
+		for (i = 0; i != longLen; i += incrementVal) {
 			SDL_RenderDrawPoint(global_renderer, p1->x + i, p1->y + (int)((double)i / divDiff));
 		}
 	}

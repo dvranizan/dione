@@ -5,6 +5,7 @@
 void loadLevel_1() {
 	int x;
 	SDL_Color blue = { 0, 0, 255 };
+	SDL_Color red = { 255, 0, 0 };
 	waveObject *obj;
 	humanObject *player;
 	lineObject *line;
@@ -36,7 +37,7 @@ void loadLevel_1() {
 	pt->x = 75;
 	pt->y = 60;
 	polylist = g_list_prepend(polylist, pt);
-	poly = buildPoly(blue, 0, polylist);
+	poly = buildPoly(red, 0, polylist);
 	kernel_register_object_simple((dioneObject*)poly);
 	/* player is almost always last so it is on top */
 	player = buildHuman();
