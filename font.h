@@ -12,3 +12,4 @@ extern SDL_Texture *render_font(char *string, SDL_Color color);
 extern int fontGetCharHeight();
 extern int fontGetCharWidth();
 extern int fontGetStrSize(const char *string, int *w, int *h);
+extern void fontWordWrap(char *string, int fontCharSize, int maxWidth);

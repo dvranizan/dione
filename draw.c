@@ -9,6 +9,7 @@
 #include "objects.h"
 #include "logging.h"
 #include "camera.h"
+#include "bezier.h"
 
 static void drawWave(waveObject* obj, SDL_Rect *drawable) {
 	/* TODO: THIS DOES NOT HANDLE ZOOM YET */
@@ -91,6 +92,20 @@ static void drawPoly(polyObject* obj, SDL_Rect *drawable) {
 	drawBetweenPoints(p1, p2, obj->color, 1);
 }
 
+/* draw bezier in line segments instead of pixles */
+static void drawBezier(bezierObject *obj, SDL_Rect *drawable) {
+	SDL_Point q0 = calculateBezierPoint(0, obj->p0, obj->p1, obj->p2, obj->p3);
+	SDL_Point q1;
+	for (int i = 1; i <= 20; i++)
+	{
+		float t = i / (float)20;
+		q1 = calculateBezierPoint(t, obj->p0, obj->p1, obj->p2, obj->p3);
+		drawBetweenPoints(&q0, &q1, obj->color, 1);
+		q0 = q1;
+	}
+
+}
+
 /* this is the main pump that will call all the specific functions */
 /* first we see if we even need to draw by checking if it is
    in the camera, via cameraGetLoc()
@@ -124,6 +139,9 @@ void drawObject(dioneObject *obj) {
 		break;
 	case OBJ_POLY:
 		drawPoly((polyObject*)obj, &drawable);
+		break;
+	case OBJ_BEZIER:
+		drawBezier((bezierObject*)obj, &drawable);
 		break;
 	default:
 		/* I never want to be here */

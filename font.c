@@ -45,3 +45,29 @@ void fontGetStrSize(const char *string, int *w, int *h) {
 	assert(global_font);
 	TTF_SizeText(global_font, string, w, h);
 }
+
+/* inject new lines into string so it will fit in given width */
+void fontWordWrap(char *string, int fontCharSize, int maxWidth) {
+	int maxCharsPerLine = floor(maxWidth / fontCharSize);
+	int currentChar = 0;
+	int lastReplaced = 0;
+	if (strlen(string) < maxCharsPerLine) {
+		/* no need to wrap */
+		return;
+	}
+	
+	for (int x = 1; x < strlen(string); ++x) {
+		++currentChar;
+		if (currentChar > maxCharsPerLine) {
+			/* need to break */
+			int y = x;
+			while (y > lastReplaced && string[y] != ' ') { ++y; } /* go back and find a place to break */
+			if (y > lastReplaced) {
+				/* success, slam in a new line! */
+				string[y] = '\n';
+				currentChar = 0;
+				lastReplaced = y;
+			}
+		}
+	}
+}

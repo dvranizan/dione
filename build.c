@@ -119,6 +119,26 @@ polyObject* buildPoly(SDL_Color c, int polyFill, GList* pointList) {
 	return poly;
 }
 
+/* cubic bezier objects, vectors stored as SDL_Points */
+bezierObject* buildBezier(SDL_Color c, SDL_Point p0, SDL_Point p1, SDL_Point p2, SDL_Point p3) {
+	SDL_Rect l = { 0, 0, 0, 0 }; /* start empty, grow around vectors */
+	bezierObject *bezier = malloc(sizeof(bezierObject));
+
+	growRecttoFitPoint(&l, p0);
+	growRecttoFitPoint(&l, p1);
+	growRecttoFitPoint(&l, p2);
+	growRecttoFitPoint(&l, p3);
+
+	buildObject((dioneObject*)bezier, OBJ_BEZIER, "bezier", l);
+	bezier->color = c;
+	bezier->p0 = p0;
+	bezier->p1 = p1;
+	bezier->p2 = p2;
+	bezier->p3 = p3;
+
+	return bezier;
+}
+
 void destroyObject(dioneObject *obj) {
 	if (obj) {
 		free(obj);
