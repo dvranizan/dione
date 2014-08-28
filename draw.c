@@ -96,8 +96,9 @@ static void drawPoly(polyObject* obj, SDL_Rect *drawable) {
 static void drawBezier(bezierObject *obj, SDL_Rect *drawable) {
 	SDL_Point q0 = calculateBezierPoint(0, obj->p0, obj->p1, obj->p2, obj->p3);
 	SDL_Point q1;
-	for (int i = 1; i <= 20; i++)
-	{
+	int i;
+
+	for (i = 1; i <= 20; i++) {
 		float t = i / (float)20;
 		q1 = calculateBezierPoint(t, obj->p0, obj->p1, obj->p2, obj->p3);
 		drawBetweenPoints(&q0, &q1, obj->color, 1);

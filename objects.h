@@ -55,6 +55,7 @@ typedef struct _object {
 	char *name;
 	SDL_Rect l;
 	SDL_Texture *texture;
+	int depth;
 } dioneObject;
 
 typedef struct {

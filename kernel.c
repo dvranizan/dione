@@ -14,9 +14,22 @@
 #include "listen.h"
 static dioneObject *gSelectedObjects[KERNEL_MAX_SELECTED_OBJECTS];
 static GHashTable *gQueuedEvents;
-static GHashTable *gRenderObjects;
+static GTree *gRenderObjects;
 static GSList *gInputObjects;
 static int gSelectedObjects_index = 0;
+
+static int kernel_compare_render_objects(gconstpointer a, gconstpointer b) {
+	const dioneObject *left = a;
+	const dioneObject *right = b;
+
+	/* depth is the ultimate determiniation of update/draw order */
+	if (left->depth != right->depth) {
+		return left->depth - right->depth;
+	}
+	/* if they are the same depth just go off ID, which is
+	   guarenteed to be unique */
+	return left->id - right->id;
+}
 
 void kernel_register_object_simple(dioneObject *obj) {
 	kernel_register_object(obj, WINDOW_STACK_DEFAULT, INPUT_CAPTURE_NONE);
@@ -26,7 +39,8 @@ void kernel_register_object(dioneObject *obj,
 							WINDOW_STACK_TYPE winType, INPUT_CAPTURE_TYPE captureType) {
 	/* register OBJ with kernel */
 	print_message(MSG_VERBOSE_NOTE, "Registering obj...", MSG_FLAG_NONE);
-	g_hash_table_add(gRenderObjects, obj);
+	g_tree_insert(gRenderObjects, obj, obj);
+	//g_hash_table_add(gRenderObjects, obj);
 	/* if it listens to input, register it */
 	if (captureType > INPUT_CAPTURE_NONE) {
 		gInputObjects = g_slist_prepend(gInputObjects, obj);
@@ -34,7 +48,7 @@ void kernel_register_object(dioneObject *obj,
 }
 
 SDL_bool kernel_remove_object(dioneObject *obj) {
-	if (g_hash_table_remove(gRenderObjects, obj)) {
+	if (g_tree_remove(gRenderObjects, obj)) {
 		return SDL_TRUE;
 	} else {
 		return SDL_FALSE;
@@ -52,22 +66,21 @@ void kernel_add_listener(dioneObject *obj, INPUT_CAPTURE_TYPE captureType) {
 	}
 }
 
+static gboolean kernel_handle_object(gpointer key, gpointer val, gpointer data) {
+	/* this will draw and update the object, which we want to do in order of depth */
+	/* we need to replace the data struct w/ GTree so it is sorted upon depth */
+	dioneObject *dObj = (dioneObject*)val;
+	/* update phase -
+	   hit every object and mutate appropriately */
+	updateObject(dObj);
+	/* draw phase -
+	   if objects are drawable, draw . does not affect game world */
+	drawObject(dObj);
+	return FALSE;
+}
 /* called by world loop, deal with all registered objects */
 void kernel_handle_objects() {
-	int x;
-	GHashTableIter iter;
-	gpointer key, value;
-
-	g_hash_table_iter_init(&iter, gRenderObjects);
-	while (g_hash_table_iter_next(&iter, &key, &value)) {
-		dioneObject *dObj = (dioneObject*)value;
-		/* update phase -
-		   hit every object and mutate appropriately */
-		updateObject(dObj);
-		/* draw phase -
-		   if objects are drawable, draw . does not affect game world */
-		drawObject(dObj);
-	}
+	g_tree_foreach(gRenderObjects, kernel_handle_object, NULL);
 }
 
 /*
@@ -78,7 +91,7 @@ void init_kernel() {
 	   performance
 	*/
 	gQueuedEvents = g_hash_table_new(NULL, NULL);
-	gRenderObjects = g_hash_table_new(NULL, NULL);
+	gRenderObjects = g_tree_new(kernel_compare_render_objects);
 	gInputObjects = NULL;
 
 	/* built in hooks */

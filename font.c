@@ -51,12 +51,13 @@ void fontWordWrap(char *string, int fontCharSize, int maxWidth) {
 	int maxCharsPerLine = floor(maxWidth / fontCharSize);
 	int currentChar = 0;
 	int lastReplaced = 0;
+	int x;
 	if (strlen(string) < maxCharsPerLine) {
 		/* no need to wrap */
 		return;
 	}
 	
-	for (int x = 1; x < strlen(string); ++x) {
+	for (x = 1; x < strlen(string); ++x) {
 		++currentChar;
 		if (currentChar > maxCharsPerLine) {
 			/* need to break */

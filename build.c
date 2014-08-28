@@ -14,19 +14,20 @@ static int get_unique_id() {
 	return new_id++;
 }
 
-static void buildObject(dioneObject *obj, OBJECT_TYPE t, char *n, SDL_Rect loc) {
+static void buildObject(dioneObject *obj, OBJECT_TYPE t, char *n, SDL_Rect loc, int d) {
 	obj->type = t;
 	obj->id = get_unique_id();
 	obj->name = n ? n : "<noname>";
 	obj->l = loc;
 	obj->texture = NULL;
+	obj->depth = d;
 }
 
 waveObject* buildWave(int num) {
 	int line_space = SCREEN_HEIGHT / 6;
 	SDL_Rect l = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 	waveObject *new_obj = malloc(sizeof(waveObject));
-	buildObject((dioneObject*)new_obj, OBJ_WAVE, NULL, l);
+	buildObject((dioneObject*)new_obj, OBJ_WAVE, NULL, l, 0);
 	new_obj->color = SDL_COLORWHEEL_WHITE;
 	new_obj->frequency = 0;
 	new_obj->amplitude = 200;
@@ -42,7 +43,7 @@ humanObject* buildHuman() {
 	SDL_Rect l = {50, 50, 10, 10};
 	SDL_Color yellow = {255, 255, 0};
 	humanObject *new_obj = malloc(sizeof(humanObject));
-	buildObject((dioneObject*)new_obj, OBJ_PEOPLE, "human", l);
+	buildObject((dioneObject*)new_obj, OBJ_PEOPLE, "human", l, 0);
 	new_obj->color = yellow;
 	new_obj->life = 100;
 	new_obj->selected = SDL_FALSE;
@@ -54,7 +55,7 @@ customObject* buildCustom(void(*updateFunc)(dioneObject*),
 						  void(*listenFunc)(dioneObject*, void*)) {
 	SDL_Rect l = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT};
 	customObject *new_obj = malloc(sizeof(customObject));
-	buildObject((dioneObject*)new_obj, OBJ_CUSTOM, "customobj", l);
+	buildObject((dioneObject*)new_obj, OBJ_CUSTOM, "customobj", l, 0);
 	new_obj->updateFunc = updateFunc;
 	new_obj->drawFunc = drawFunc;
 	new_obj->listenFunc = listenFunc;
@@ -64,7 +65,7 @@ customObject* buildCustom(void(*updateFunc)(dioneObject*),
 lineObject* buildLine(SDL_Color c, int w, int x1, int y1, int x2, int y2) {
 	SDL_Rect l = { x1, y1, x2, y2 };
 	lineObject *line = malloc(sizeof(lineObject));
-	buildObject((dioneObject*)line, OBJ_LINE, "line", l);
+	buildObject((dioneObject*)line, OBJ_LINE, "line", l, 0);
 	line->color = c;
 	line->w = w;
 	line->x1 = x1;
@@ -111,7 +112,7 @@ polyObject* buildPoly(SDL_Color c, int polyFill, GList* pointList) {
 		SDL_Point *point = (SDL_Point*)(ll->data);
 		growRecttoFitPoint(&l, *point);
 	}
-	buildObject((dioneObject*)poly, OBJ_POLY, "poly", l);
+	buildObject((dioneObject*)poly, OBJ_POLY, "poly", l, 0);
 	poly->color = c;
 	poly->fill = polyFill;
 	poly->pointList = pointList;
@@ -129,7 +130,7 @@ bezierObject* buildBezier(SDL_Color c, SDL_Point p0, SDL_Point p1, SDL_Point p2,
 	growRecttoFitPoint(&l, p2);
 	growRecttoFitPoint(&l, p3);
 
-	buildObject((dioneObject*)bezier, OBJ_BEZIER, "bezier", l);
+	buildObject((dioneObject*)bezier, OBJ_BEZIER, "bezier", l, 0);
 	bezier->color = c;
 	bezier->p0 = p0;
 	bezier->p1 = p1;
