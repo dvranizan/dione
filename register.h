@@ -1,14 +1,6 @@
-#inclube "SDL2/SDL.h"
-#include "globals.h"
+#ifdef __GNUC__
+#include "SDL2/SDL.h"
+#else
+#include "SDL.h"
+#endif
 
-extern void registerAddGameObject(dioneObject *obj);
-extern void registerAddHUDObject(dioneObject *obj);
-
-extern void registerAddToGameObject(dioneObject *mainObj, dioneObject *new);
-extern void registerAddToHUDObject(dioneObject *mainObj, dioneObject *new);
-
-extern SDL_bool registerRemoveGameObject(int id);
-extern SDL_bool registerRemoveHUDObject(int id);
-
-extern dioneObject** getGameList();
-extern dioneObject** getHUDList();

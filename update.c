@@ -9,6 +9,7 @@
 #include "objects.h"
 #include "logging.h"
 #include "camera.h"
+#include "font.h"
 
 SDL_Keycode updatePlayerDirection = SDLK_0;
 static double updatePlayerLatSpeed = 10.0; /* pixels per second */
@@ -56,6 +57,27 @@ static void updatePoly(polyObject *obj) {
 static void updateBezier(bezierObject *obj) {
 }
 
+static void updateTexture(textureObject *obj) {
+	/* TODO: advance frames */
+	assert(obj->current_frame <= obj->num_frames);
+	((dioneObject*)obj)->l.x = ((dioneObject*)obj)->l.w * obj->current_frame;
+}
+
+static void updateText(textObject *obj) {
+	int w, h;
+	dioneObject *base = (dioneObject*)obj;
+	char *text = *(obj->text);
+	/* nuke old surface if necessary */
+	if (base->texture) {
+		SDL_DestroyTexture(base->texture);
+	}
+
+	base->texture = render_font(text, obj->color);
+	SDL_QueryTexture(base->texture, NULL, NULL, &w, &h);
+	base->l.w = w;
+	base->l.h = h;
+}
+
 /* this processes all game events and updates items appropriately */
 void updateObject(dioneObject *obj) {
 	switch (TYPEOF(obj)) {
@@ -76,6 +98,12 @@ void updateObject(dioneObject *obj) {
 		break;
 	case OBJ_BEZIER:
 		updateBezier((bezierObject*)obj);
+		break;
+	case OBJ_TEXTURE:
+		updateTexture((textureObject*)obj);
+		break;
+	case OBJ_TEXT:
+		updateText((textObject*)obj);
 		break;
 	default:
 		/* I never want to be here */

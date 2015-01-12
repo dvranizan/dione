@@ -14,12 +14,6 @@ typedef enum _EVENT_TYPE {
 	EVENT_PROC_SPAWN
 } EVENT_TYPE;
 
-typedef enum _WINDOW_STACK_TYPE {
-	WINDOW_STACK_DEFAULT,
-	WINDOW_STACK_ON_TOP,
-	WINDOW_STACK_ON_BOT
-} WINDOW_STACK_TYPE;
-
 typedef enum _INPUT_CAPTURE_TYPE {
 	INPUT_CAPTURE_NONE,
 	INPUT_CAPTURE_NORMAL,
@@ -60,12 +54,13 @@ extern void kernel_exec_events();
 
 extern void kernel_handle_objects();
 extern void kernel_register_object_simple(dioneObject *obj);
-extern void kernel_register_object(dioneObject *obj, 
-								   WINDOW_STACK_TYPE winType, INPUT_CAPTURE_TYPE captureType);
+extern void kernel_register_object(dioneObject *obj, int winID, INPUT_CAPTURE_TYPE captureType);
 extern SDL_bool kernel_remove_object(dioneObject *obj);
 
 extern SDL_bool kernel_remove_listener(dioneObject *obj);
 extern void kernel_add_listener(dioneObject *obj, INPUT_CAPTURE_TYPE captureType);
+
+extern SDL_bool kernel_remove_window(int winID);
 
 extern void init_kernel();
 #endif

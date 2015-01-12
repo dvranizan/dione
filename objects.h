@@ -34,7 +34,9 @@ typedef enum _OBJECT_TYPE {
 	OBJ_WAVE,
 	OBJ_CUSTOM,
 	OBJ_POLY,
-	OBJ_BEZIER
+	OBJ_BEZIER,
+	OBJ_TEXTURE,
+	OBJ_TEXT
 } OBJECT_TYPE;
 
 /* 
@@ -57,6 +59,19 @@ typedef struct _object {
 	SDL_Texture *texture;
 	int depth;
 } dioneObject;
+
+typedef struct {
+	dioneObject ob_base;
+	int num_frames;
+	int current_frame;
+	int frame_speed;
+} textureObject;
+
+typedef struct {
+	dioneObject ob_base;
+	SDL_Color color;
+	char **text;
+} textObject;
 
 typedef struct {
 	dioneObject ob_base;
@@ -124,5 +139,18 @@ typedef struct {
 	SDL_Event *event;
 	int tick_time;
 } kernelEvent;
+
+/* window flags */
+#define FLAGS_WINDOW_NOFLAGS 0x00000000
+#define FLAGS_WINDOW_REMOVE  0x00000001
+
+/* windower */
+typedef struct _dioneWindow {
+	int id;
+	int flags;
+	SDL_Rect loc;
+	GTree *objects;
+} dioneWindow;
+
 
 #endif

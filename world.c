@@ -12,6 +12,7 @@
 #include "draw.h"
 #include "camera.h"
 #include "update.h"
+#include "windower.h"
 
 static dioneObject *renderObjects[MAX_OBJECTS];
 
@@ -34,6 +35,7 @@ int worldLoop() {
 	/* init everything */
 	init_font();
 	init_message_system();
+	init_windower();
 	init_kernel();
 
 	/* setup camera */
@@ -41,6 +43,7 @@ int worldLoop() {
 	/*this is ultimately not how I want to do it but whatever */
 	loadLevel_1();
 
+	set_verbosity(MSG_VERBOSE_WARNING);
 	print_message(MSG_VERBOSE_NOTE, "Entering main loop...", MSG_FLAG_NONE);
 	while (!done) {
 		while (SDL_PollEvent(&e)) {

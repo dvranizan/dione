@@ -39,7 +39,7 @@ void toggle_console() {
 
 	if (!console_hidden) {
 		/* register term w/ kernel to draw */
-		kernel_register_object((dioneObject*)console_obj, WINDOW_STACK_ON_TOP, INPUT_CAPTURE_NONE);
+		kernel_register_object((dioneObject*)console_obj, 0, INPUT_CAPTURE_NONE);
 		/* TODO - elevate listening to block input to other objects */
 	} else {
 		/* remove the terminal */

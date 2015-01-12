@@ -140,6 +140,28 @@ bezierObject* buildBezier(SDL_Color c, SDL_Point p0, SDL_Point p1, SDL_Point p2,
 	return bezier;
 }
 
+textureObject* buildTexture(SDL_Color c, SDL_Texture *tex, SDL_Rect size, int num_frames, int speed) {
+	/* todo: this needs to be given a path to data, not a SDL_texture */
+	SDL_Rect l = { 0, 0, 0, 0};
+	textureObject *texture = malloc(sizeof(textureObject));
+
+	SDL_QueryTexture(tex, NULL, NULL, &l.w, &l.h);
+
+	buildObject((dioneObject*)texture, OBJ_TEXTURE, "tex", l, 0);
+	texture->num_frames = num_frames;
+	texture->current_frame = 0;
+	texture->frame_speed = speed;
+	return texture;
+}
+	
+textObject* buildText(SDL_Color c, char **t) {
+	SDL_Rect l = {0, 0, 0, 0};
+	textObject *text = malloc(sizeof(textObject));
+	buildObject((dioneObject*)text, OBJ_TEXT, *t, l, 0);
+	text->color = c;
+	text->text = t;
+}
+
 void destroyObject(dioneObject *obj) {
 	if (obj) {
 		free(obj);

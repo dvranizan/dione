@@ -11,17 +11,18 @@
 #include "camera.h"
 #include "bezier.h"
 
+static int gDrawOffset_x = 0;
+static int gDrawOffset_y = 0;
+
 static void drawWave(waveObject* obj, SDL_Rect *drawable) {
-	/* TODO: THIS DOES NOT HANDLE ZOOM YET */
-	SDL_SetRenderDrawColor(global_renderer, obj->color.r, obj->color.g, obj->color.b, 255);
-	SDL_RenderDrawPoints(global_renderer, obj->line, SCREEN_WIDTH);
+
 }
 
 static void drawPerson(humanObject* obj, SDL_Rect *drawable) {
-	SDL_SetRenderDrawColor(global_renderer, obj->color.r, obj->color.g, obj->color.b, 255);
-	SDL_RenderDrawRect(global_renderer, drawable);
+
 }
 
+/* this is as low as it gets. slams pixels onto surface */
 static void drawBetweenPoints(SDL_Point* p1, SDL_Point* p2, SDL_Color c, int w) {
 	double divDiff;
 	bool yLonger = false;
@@ -55,12 +56,16 @@ static void drawBetweenPoints(SDL_Point* p1, SDL_Point* p2, SDL_Color c, int w) 
 	SDL_SetRenderDrawColor(global_renderer, c.r, c.g, c.b, 255);
 	if (yLonger) {
 		for (i = 0; i != longLen; i += incrementVal) {
-			SDL_RenderDrawPoint(global_renderer, p1->x + (int)((double)i / divDiff), p1->y + i);
+			int x = p1->x + (int)((double)i / divDiff) + gDrawOffset_x;
+			int y = p1->y + i + gDrawOffset_y;
+			SDL_RenderDrawPoint(global_renderer, x, y);
 		}
 	}
 	else {
 		for (i = 0; i != longLen; i += incrementVal) {
-			SDL_RenderDrawPoint(global_renderer, p1->x + i, p1->y + (int)((double)i / divDiff));
+			int x = p1->x + i + gDrawOffset_x;
+			int y = p1->y + (int)((double)i / divDiff) + gDrawOffset_y;
+			SDL_RenderDrawPoint(global_renderer, x, y);
 		}
 	}
 }
@@ -107,6 +112,40 @@ static void drawBezier(bezierObject *obj, SDL_Rect *drawable) {
 
 }
 
+static void drawTexture(textureObject *obj, SDL_Rect *drawable) {
+	SDL_Rect source = ((dioneObject*)obj)->l;
+	SDL_Rect target = ((dioneObject*)obj)->l;
+	/* skip to proper source frame */
+	source.x = source.x * obj->current_frame;
+	source.y = 0;
+	/* shift for window */
+	target.x += gDrawOffset_x;
+	target.y += gDrawOffset_y;
+	SDL_RenderCopy(global_renderer, ((dioneObject*)obj)->texture, &source, &target);
+}
+
+/* low level routine to draw texture on screen, given texture and 
+   offsets, acc global offsets */
+static void draw_texture(SDL_Texture *tex, const SDL_Rect* source, SDL_Rect target) {
+	target.x += gDrawOffset_x;
+	target.y += gDrawOffset_y;
+	SDL_RenderCopy(global_renderer, tex, source, &target);
+}
+
+static void drawText(textObject *obj, SDL_Rect *drawable) {
+	draw_texture(((dioneObject*)obj)->texture, NULL, ((dioneObject*)obj)->l);
+}
+
+/* set offset for window for low level draw */
+void draw_set_offset(SDL_Rect loc) {
+	gDrawOffset_x = loc.x;
+	gDrawOffset_y = loc.y;
+}
+
+void draw_window(dioneWindow *win) {
+	/* STUB - nothing to do for window yet */
+}
+
 /* this is the main pump that will call all the specific functions */
 /* first we see if we even need to draw by checking if it is
    in the camera, via cameraGetLoc()
@@ -143,6 +182,12 @@ void drawObject(dioneObject *obj) {
 		break;
 	case OBJ_BEZIER:
 		drawBezier((bezierObject*)obj, &drawable);
+		break;
+	case OBJ_TEXTURE:
+		drawTexture((textureObject*)obj, &drawable);
+		break;
+	case OBJ_TEXT:
+		drawText((textObject*)obj, &drawable);
 		break;
 	default:
 		/* I never want to be here */

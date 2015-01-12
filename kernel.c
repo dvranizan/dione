@@ -7,16 +7,19 @@
 #include <assert.h>
 
 #include "kernel.h"
+#include "windower.h"
 #include "globals.h"
 #include "objects.h"
 #include "fps.h"
 #include "logging.h"
 #include "listen.h"
+
 static dioneObject *gSelectedObjects[KERNEL_MAX_SELECTED_OBJECTS];
 static GHashTable *gQueuedEvents;
 static GTree *gRenderObjects;
 static GSList *gInputObjects;
 static int gSelectedObjects_index = 0;
+
 
 static int kernel_compare_render_objects(gconstpointer a, gconstpointer b) {
 	const dioneObject *left = a;
@@ -32,14 +35,18 @@ static int kernel_compare_render_objects(gconstpointer a, gconstpointer b) {
 }
 
 void kernel_register_object_simple(dioneObject *obj) {
-	kernel_register_object(obj, WINDOW_STACK_DEFAULT, INPUT_CAPTURE_NONE);
+	kernel_register_object(obj, 0, INPUT_CAPTURE_NONE);
 }
 
 void kernel_register_object(dioneObject *obj, 
-							WINDOW_STACK_TYPE winType, INPUT_CAPTURE_TYPE captureType) {
+							int win_id, INPUT_CAPTURE_TYPE captureType) {
+	dioneWindow* targetWindow;
 	/* register OBJ with kernel */
 	print_message(MSG_VERBOSE_NOTE, "Registering obj...", MSG_FLAG_NONE);
-	g_tree_insert(gRenderObjects, obj, obj);
+	//find proper window
+	targetWindow = windower_find_window(win_id);
+	assert(targetWindow);
+	g_tree_insert(targetWindow->objects, obj, obj);
 	//g_hash_table_add(gRenderObjects, obj);
 	/* if it listens to input, register it */
 	if (captureType > INPUT_CAPTURE_NONE) {
@@ -66,6 +73,14 @@ void kernel_add_listener(dioneObject *obj, INPUT_CAPTURE_TYPE captureType) {
 	}
 }
 
+SDL_bool kernel_remove_window(int winID) {
+	dioneWindow* win = windower_find_window(winID);
+	assert(win);
+	//flag window for deletion, will occur after handle objects iteration
+	win->flags |= FLAGS_WINDOW_REMOVE;
+	return SDL_TRUE;
+}
+
 static gboolean kernel_handle_object(gpointer key, gpointer val, gpointer data) {
 	/* this will draw and update the object, which we want to do in order of depth */
 	/* we need to replace the data struct w/ GTree so it is sorted upon depth */
@@ -78,9 +93,26 @@ static gboolean kernel_handle_object(gpointer key, gpointer val, gpointer data) 
 	drawObject(dObj);
 	return FALSE;
 }
+
 /* called by world loop, deal with all registered objects */
 void kernel_handle_objects() {
-	g_tree_foreach(gRenderObjects, kernel_handle_object, NULL);
+	GSList *windows = windower_get_windows();
+
+	while (windows) {
+		/* set current window */
+		dioneWindow* win = (dioneWindow*)(windows->data);
+		/* set offset for window */
+		draw_set_offset(win->loc);
+		/* set correct texture for drawing and objects tree*/
+		gRenderObjects = win->objects;
+		/*iterate*/
+		g_tree_foreach(gRenderObjects, kernel_handle_object, NULL);
+		/* draw window to global */
+		draw_window(win);
+		windows = windows->next;
+	}
+	/* take care of window flags */
+	windower_update_windows();
 }
 
 /*
@@ -91,11 +123,18 @@ void init_kernel() {
 	   performance
 	*/
 	gQueuedEvents = g_hash_table_new(NULL, NULL);
+	
 	gRenderObjects = g_tree_new(kernel_compare_render_objects);
 	gInputObjects = NULL;
 
 	/* built in hooks */
 	register_console();
+	register_fps();
+}
+
+void kernel_init_window(dioneWindow *win) {
+	assert(win);
+	win->objects = g_tree_new(kernel_compare_render_objects);
 }
 
 /*
