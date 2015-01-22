@@ -21,6 +21,8 @@ static void buildObject(dioneObject *obj, OBJECT_TYPE t, char *n, SDL_Rect loc, 
 	obj->l = loc;
 	obj->texture = NULL;
 	obj->depth = d;
+	obj->update_frequency = 0;
+	obj->last_update = 0;
 }
 
 waveObject* buildWave(int num) {
@@ -160,6 +162,7 @@ textObject* buildText(SDL_Color c, char **t) {
 	buildObject((dioneObject*)text, OBJ_TEXT, *t, l, 0);
 	text->color = c;
 	text->text = t;
+	return text;
 }
 
 void destroyObject(dioneObject *obj) {

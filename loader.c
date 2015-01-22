@@ -14,6 +14,10 @@ void loadLevel_1() {
 	GList *polylist = NULL;
 	SDL_Point *pt = NULL;
 	SDL_Point p0, p1, p2, p3;
+	textObject *txt;
+	textObject *txt2;
+	textObject *txt3;
+	static char *test_txt;
 	char * str = "This is a text string that will require some pretty intense word wrapping and I hope it works well.";
 
 	/* testing out the lines */
@@ -51,7 +55,18 @@ void loadLevel_1() {
 	beizer = buildBezier(blue, p0, p1, p2, p3);
 	kernel_register_object_simple((dioneObject*)beizer);
 
-
+	test_txt = malloc(sizeof(char) * 5);
+	sprintf(test_txt, "test");
+	txt = buildText(blue, &test_txt);
+	txt2 = buildText(red, &test_txt);
+	txt2->ob_base.l.x = 400;
+	txt2->ob_base.l.y = 400;
+	txt3 = buildText(blue, &test_txt);
+	txt3->ob_base.l.x = 200;
+	txt3->ob_base.l.y = 200;
+	kernel_register_object_simple((dioneObject*)txt);
+	kernel_register_object_simple((dioneObject*)txt2);
+	kernel_register_object_simple((dioneObject*)txt3);
 	/* player is almost always last so it is on top */
 	player = buildHuman();
 	kernel_register_object_simple((dioneObject*)player);

@@ -2,6 +2,7 @@
 #include "SDL2/SDL.h"
 #else
 #include "SDL.h"
+#define snprintf _snprintf
 #endif
 #include <assert.h>
 
@@ -19,7 +20,7 @@ static SDL_Rect fps_loc;
 static double fps_current_frame_ticks;
 static char *fps_string;
 static int fps_window_id;
-SDL_Color white = {255,255,255};
+SDL_Color white = {255,255,255,255};
 
 void fps_break() {
 	/* calculate how long that frame took and store time passed in globals */
@@ -44,6 +45,7 @@ int fps_get_ticks() {
 void register_fps() {
 	assert(!fps_txt);
 	fps_txt = buildText(white, &fps_string);
+	obj_set_update_frequency(fps_txt, 100);
 	/* TODO - WINDOW MANAGER */
 	fps_loc.x = SCREEN_WIDTH - 40;
 	fps_loc.y = 0;

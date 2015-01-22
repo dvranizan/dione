@@ -80,6 +80,12 @@ static void updateText(textObject *obj) {
 
 /* this processes all game events and updates items appropriately */
 void updateObject(dioneObject *obj) {
+	if (!TEST_OBJ_NEEDS_UPDATE(obj)) {
+		return;
+	}
+
+	CLEAR_OBJ_NEEDS_UPDATE(obj);
+
 	switch (TYPEOF(obj)) {
 	case OBJ_LINE:
 		updateLine((waveObject*)obj);

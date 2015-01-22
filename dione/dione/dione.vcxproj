@@ -51,7 +51,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_LIB;inline=__inline;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\david\dev\glib-dev_2.34.3-1\lib\glib-2.0\include;C:\Users\david\dev\glib-dev_2.34.3-1\include\glib-2.0;C:\Users\david\dev\SDL2_ttf-2.0.12\include;C:\Users\david\dev\SDL2-2.0.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
@@ -97,6 +97,7 @@
     <ClCompile Include="..\..\main.c" />
     <ClCompile Include="..\..\objects.c" />
     <ClCompile Include="..\..\update.c" />
+    <ClCompile Include="..\..\windower.c" />
     <ClCompile Include="..\..\world.c" />
   </ItemGroup>
   <ItemGroup>
@@ -114,6 +115,7 @@
     <ClInclude Include="..\..\logging.h" />
     <ClInclude Include="..\..\objects.h" />
     <ClInclude Include="..\..\update.h" />
+    <ClInclude Include="..\..\windower.h" />
     <ClInclude Include="..\..\world.h" />
   </ItemGroup>
   <ItemGroup>

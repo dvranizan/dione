@@ -15,13 +15,13 @@ int init_font() {
 #ifdef __GNUC__
 	global_font = TTF_OpenFont("fonts/FreeMono.ttf", 24);
 #else
-	global_font = TTF_OpenFont("C:\\Users\\david\\Source\\Repos\\dione\\fonts\\FreeMono.ttf", 24);
+	global_font = TTF_OpenFont("C:\\Users\\david\\dev\\FreeMono.ttf", 24);
 #endif
 	assert(global_font);
 }
 
 SDL_Texture *render_font(char *string, SDL_Color color) {
-	SDL_Surface *surf = TTF_RenderText_Solid(global_font, string, color);
+	SDL_Surface *surf = TTF_RenderText_Blended(global_font, string, color);
 	SDL_Texture *tex = SDL_CreateTextureFromSurface(global_renderer, surf);
 
 	SDL_FreeSurface(surf);
@@ -39,6 +39,7 @@ int fontGetCharHeight() {
 
 int fontGetCharWidth() {
 	assert(0); //TODO
+	return 1;
 }
 
 void fontGetStrSize(const char *string, int *w, int *h) {

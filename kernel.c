@@ -87,6 +87,14 @@ static gboolean kernel_handle_object(gpointer key, gpointer val, gpointer data) 
 	dioneObject *dObj = (dioneObject*)val;
 	/* update phase -
 	   hit every object and mutate appropriately */
+	if (dObj->last_update + dObj->update_frequency < fps_get_ticks()) {
+		/* currently this seems really redundant, to set the flag 
+		   right before calling, but in the future this flag can be
+		   set elsewhere
+		*/
+		dObj->last_update = fps_get_ticks();
+		SET_OBJ_NEEDS_UPDATE(dObj);
+	}
 	updateObject(dObj);
 	/* draw phase -
 	   if objects are drawable, draw . does not affect game world */

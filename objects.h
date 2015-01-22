@@ -51,14 +51,26 @@ typedef struct _loc {
 	int w;
 } loc;
 
+/* object flags */
+#define FLAGS_OBJECT_NEEDS_UPDATE 0x0001
+
+#define TEST_OBJ_NEEDS_UPDATE(obj) ((((dioneObject*)obj)->flags & FLAGS_OBJECT_NEEDS_UPDATE))
+#define SET_OBJ_NEEDS_UPDATE(obj) (((dioneObject*)obj)->flags |= FLAGS_OBJECT_NEEDS_UPDATE)
+#define CLEAR_OBJ_NEEDS_UPDATE(obj) (((dioneObject*)obj)->flags &= !FLAGS_OBJECT_NEEDS_UPDATE)
+
 typedef struct _object {
 	OBJECT_TYPE type;
 	int id;
+	int flags;
+	int last_update;
+	int update_frequency;
 	char *name;
 	SDL_Rect l;
 	SDL_Texture *texture;
 	int depth;
 } dioneObject;
+
+void obj_set_update_frequency(dioneObject* obj, int freq);
 
 typedef struct {
 	dioneObject ob_base;

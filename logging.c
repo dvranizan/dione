@@ -15,8 +15,8 @@
 #include "console.h"
 
 static GList *gMessageList = NULL;
-static SDL_Color default_color = {0,0,0};
-static SDL_Color highlight_color = {0,0,0};
+static SDL_Color default_color = {0,0,0,0};
+static SDL_Color highlight_color = {0,0,0,0};
 static msg_verbosity global_verbosity = MSG_VERBOSE_WARNING;
 static int console_hidden = 0;
 static customObject *console_obj = NULL;
@@ -79,8 +79,8 @@ void set_verbosity(msg_verbosity level) {
 
 void init_message_system() {
 	/* set msg color */
-	default_color = (SDL_Color){255, 255, 255};
-	highlight_color = (SDL_Color){255, 0, 0};
+	default_color = (SDL_Color){255, 255, 255,255};
+	highlight_color = (SDL_Color){255, 0, 0,255};
 	console_hidden = 1; /*default hidden*/
 	assert(!logging_input_buffer);
 	logging_input_buffer = g_string_new(CONSOLE_BUFFER_PROMPT);
