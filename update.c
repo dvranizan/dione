@@ -113,7 +113,7 @@ void updateObject(dioneObject *obj) {
 		break;
 	default:
 		/* I never want to be here */
-		print_message(MSG_VERBOSE_ERROR, "[UPDATE] I have no idea how to handle this!", MSG_FLAG_NONE);
+		print_message(MSG_VERBOSE_ERROR, MSG_FLAG_NONE, "[UPDATE] I have no idea how to handle this! ptr: %x", obj);
 
 	}
 }

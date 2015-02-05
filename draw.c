@@ -191,7 +191,7 @@ void drawObject(dioneObject *obj) {
 		break;
 	default:
 		/* I never want to be here */
-		print_message(MSG_VERBOSE_ERROR, "[draw] I have no idea how to handle this!", MSG_FLAG_NONE);
+		print_message(MSG_VERBOSE_ERROR, MSG_FLAG_NONE, "[draw] I have no idea how to handle this obj: %x!", obj);
 	}
 }
 

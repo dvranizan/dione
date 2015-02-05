@@ -14,6 +14,6 @@ void listen_handler(dioneObject *obj, void *data) {
 		break;
 	default:
 		/* I never want to be here */
-		print_message(MSG_VERBOSE_ERROR, "[listener] I have no idea how to handle this!", MSG_FLAG_NONE);
+		print_message(MSG_VERBOSE_ERROR, MSG_FLAG_NONE, "[listener] I have no idea how to handle this! ptr: %x", obj);
 	}
 }

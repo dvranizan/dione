@@ -44,7 +44,7 @@ int worldLoop() {
 	loadLevel_1();
 
 	set_verbosity(MSG_VERBOSE_WARNING);
-	print_message(MSG_VERBOSE_NOTE, "Entering main loop...", MSG_FLAG_NONE);
+	print_message(MSG_VERBOSE_NOTE, MSG_FLAG_NONE, "Entering main loop...");
 	while (!done) {
 		while (SDL_PollEvent(&e)) {
 			switch (e.type) {

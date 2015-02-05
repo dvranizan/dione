@@ -24,11 +24,11 @@ void init_windower() {
 }
 int windower_create_window(SDL_Rect loc) {
 	dioneWindow* new_window = malloc(sizeof(dioneWindow));
-	print_message(MSG_VERBOSE_NOTE, "[windower] Creating window...", MSG_FLAG_NONE);
 	new_window->id = ++window_id_count;
 	new_window->flags = FLAGS_WINDOW_NOFLAGS;
 	new_window->loc = loc;
 	new_window->objects = NULL;
+	print_message(MSG_VERBOSE_NOTE, MSG_FLAG_NONE, "[windower] Creating window [%d]...", new_window->id);
 	/* add window to global list */
 	gWindowList = g_slist_prepend(gWindowList, new_window);
 	kernel_init_window(new_window);
@@ -38,7 +38,7 @@ int windower_create_window(SDL_Rect loc) {
 static GSList* windower_remove_window(dioneWindow *win) {
 	GSList *ret;
 	assert (win->id != 0); //can never remove the top window
-	print_message(MSG_VERBOSE_NOTE, "[windower] Removing window...", MSG_FLAG_NONE);
+	print_message(MSG_VERBOSE_NOTE, MSG_FLAG_NONE, "[windower] Removing window [%d]...", win->id);
 	if ((ret = g_slist_remove(gWindowList, win))) {
 		/* do some cleanup */
 		//SDL_DestroyTexture(win->texture);

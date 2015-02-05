@@ -5,6 +5,8 @@
 #endif
 #include <assert.h>
 #include "glib.h"
+#include <stdio.h>
+#include <stdarg.h>
 
 #include "logging.h"
 #include "font.h"
@@ -61,16 +63,23 @@ static void fill_msg_node(msg_node *msg, char *meat, int msg_flags) {
 	msg->msg_meat = render_font(meat, c);
 }
 
-void print_message(msg_verbosity level, char *msg, int msg_flags) {
+void print_message(msg_verbosity level, int msg_flags, char *msg, ...) {
+	va_list argp;
 	msg_node *new_msg;
-	
+	char buffer[1024];
+
 	if (msg_flags & MSG_FLAG_NO_SUPPRESS || level >= global_verbosity) {
 	} else {
 		/* this is not high enough priority to print */
 		return;
 	}
+	/* format string */
+	va_start(argp, msg);
+	vsprintf(buffer, msg, argp);
+	va_end(argp);
+	/* insert into system (render to texture) */
 	new_msg = new_msg_node();
-	fill_msg_node(new_msg, msg, msg_flags);
+	fill_msg_node(new_msg, buffer, msg_flags);
 }
 
 void set_verbosity(msg_verbosity level) {
@@ -85,7 +94,7 @@ void init_message_system() {
 	assert(!logging_input_buffer);
 	logging_input_buffer = g_string_new(CONSOLE_BUFFER_PROMPT);
 	/* crank out a initial "welcome to whatever" msg */
-	print_message(MSG_VERBOSE_NOTE, "Welcome to DIONE!", MSG_FLAG_NO_SUPPRESS|MSG_FLAG_HIGHLIGHT);
+	print_message(MSG_VERBOSE_NOTE, MSG_FLAG_NO_SUPPRESS|MSG_FLAG_HIGHLIGHT, "Welcome to DIONE!");
 	
 }
 
@@ -151,9 +160,8 @@ void listen_terminal(dioneObject *obj, void *data) {
 		break;
 	case SDLK_RETURN:
 		/* echo the command */
-		print_message(MSG_VERBOSE_ALL, 
-					  logging_input_buffer->str+CONSOLE_BUFFER_PROMPT_LENGTH, 
-					  MSG_FLAG_NO_SUPPRESS);
+		print_message(MSG_VERBOSE_ALL, MSG_FLAG_NO_SUPPRESS,
+					  logging_input_buffer->str+CONSOLE_BUFFER_PROMPT_LENGTH);
 		/* exec the command */
 		console_exec_string(logging_input_buffer->str + CONSOLE_BUFFER_PROMPT_LENGTH);
 		/* clear the input buffer */

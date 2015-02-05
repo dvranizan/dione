@@ -22,7 +22,7 @@ typedef struct _msg_node {
 
 extern void init_message_system();
 extern void set_verbosity(msg_verbosity level);
-extern void print_message(msg_verbosity level, char *msg, int msg_flags);
+extern void print_message(msg_verbosity level, int msg_flags, char *msg, ...);
 
 extern void draw_terminal(dioneObject *obj);
 extern void update_terminal(dioneObject *obj);

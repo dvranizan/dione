@@ -45,7 +45,7 @@ int fps_get_ticks() {
 void register_fps() {
 	assert(!fps_txt);
 	fps_txt = buildText(white, &fps_string);
-	obj_set_update_frequency(fps_txt, 100);
+	obj_set_update_frequency((dioneObject*)fps_txt, 100);
 	/* TODO - WINDOW MANAGER */
 	fps_loc.x = SCREEN_WIDTH - 40;
 	fps_loc.y = 0;

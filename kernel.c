@@ -42,7 +42,7 @@ void kernel_register_object(dioneObject *obj,
 							int win_id, INPUT_CAPTURE_TYPE captureType) {
 	dioneWindow* targetWindow;
 	/* register OBJ with kernel */
-	print_message(MSG_VERBOSE_NOTE, "Registering obj...", MSG_FLAG_NONE);
+	print_message(MSG_VERBOSE_NOTE, MSG_FLAG_NONE, "Registering obj [%x]...", obj);
 	//find proper window
 	targetWindow = windower_find_window(win_id);
 	assert(targetWindow);
@@ -177,7 +177,7 @@ static void kernel_exec_event(dioneEvent *ev) {
 	switch (ev->type) {
 	case EVENT_KEYPRESS: {
 		dioneEventKey *key = (dioneEventKey*)ev;
-		print_message(MSG_VERBOSE_NOTE, "Key pressed!", MSG_FLAG_NONE);
+		print_message(MSG_VERBOSE_NOTE, MSG_FLAG_NONE, "Key [%d] pressed!", key->key.sym);
 		switch (key->key.sym) {
 		case SDLK_w:
 		case SDLK_s:
@@ -195,7 +195,7 @@ static void kernel_exec_event(dioneEvent *ev) {
 	}
 	default:
 		/* we should never get here */
-		print_message(MSG_VERBOSE_ERROR, "Trying to handle an event I don't understand!", MSG_FLAG_NONE);
+		print_message(MSG_VERBOSE_ERROR, MSG_FLAG_NONE, "Trying to handle an event I don't understand!");
 	}
 }
 
